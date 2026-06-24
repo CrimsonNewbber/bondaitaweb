@@ -1,10 +1,145 @@
+```html
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bondaita</title>
+<meta charset="utf-8">
+<title>Choice Selector</title>
+
+<style>
+body{
+    margin:0;
+    background:#eee;
+    overflow:hidden;
+    font-family:sans-serif;
+}
+
+.option{
+    position:absolute;
+    width:180px;
+    height:180px;
+    border:8px solid #999;
+    border-radius:10px;
+    background:white;
+    object-fit:cover;
+}
+
+#top1{left:350px;top:40px;}
+#top2{left:750px;top:40px;}
+#left{left:40px;top:280px;}
+#right{right:40px;top:280px;}
+
+#trail{
+    position:absolute;
+    width:300px;
+    height:120px;
+    background:linear-gradient(to right,
+        rgba(0,255,150,0),
+        rgba(0,255,150,.8));
+    transform-origin:left center;
+}
+
+#head{
+    position:absolute;
+    width:120px;
+    height:120px;
+    background:white;
+    border:5px solid black;
+    border-radius:5px;
+}
+
+.eye{
+    position:absolute;
+    width:12px;
+    height:12px;
+    background:black;
+    border-radius:50%;
+    top:35px;
+}
+
+#e1{left:35px;}
+#e2{right:35px;}
+
+#mouth{
+    position:absolute;
+    width:60px;
+    height:30px;
+    border-bottom:6px solid black;
+    border-radius:0 0 50px 50px;
+    left:30px;
+    top:60px;
+}
+</style>
 </head>
+
 <body>
-    <h1>in alpha</h1>
-    <p>nevido studios</p>
+
+<img class="option" id="top1"
+src="https://via.placeholder.com/180">
+
+<img class="option" id="top2"
+src="https://via.placeholder.com/180">
+
+<img class="option" id="left"
+src="https://via.placeholder.com/180">
+
+<img class="option" id="right"
+src="https://via.placeholder.com/180">
+
+<div id="trail"></div>
+
+<div id="head">
+    <div class="eye" id="e1"></div>
+    <div class="eye" id="e2"></div>
+    <div id="mouth"></div>
+</div>
+
+<script>
+const spots = [
+    {x:500,y:130},
+    {x:900,y:130},
+    {x:200,y:370},
+    {x:1250,y:370}
+];
+
+let selected = 0;
+
+const head = document.getElementById("head");
+const trail = document.getElementById("trail");
+
+function update(){
+    let p = spots[selected];
+
+    head.style.left = p.x + "px";
+    head.style.top = p.y + "px";
+
+    trail.style.left = (p.x - 250) + "px";
+    trail.style.top = (p.y + 40) + "px";
+}
+
+update();
+
+document.addEventListener("keydown", e=>{
+
+    if(e.key==="ArrowRight")
+        selected=(selected+1)%spots.length;
+
+    if(e.key==="ArrowLeft")
+        selected=(selected-1+spots.length)%spots.length;
+
+    if(e.key==="ArrowUp")
+        selected=(selected+1)%spots.length;
+
+    if(e.key==="ArrowDown")
+        selected=(selected+1)%spots.length;
+
+    if(e.key==="Enter"){
+        alert("Selected option " + (selected+1));
+    }
+
+    update();
+});
+</script>
+
 </body>
 </html>
+```
