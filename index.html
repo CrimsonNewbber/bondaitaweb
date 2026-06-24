@@ -1,212 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Cursor Selector</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cursor Tracking Layout</title>
 <style>
-  :root{
-    --bg:#efefef;
-    --frame:#9f9f9f;
-    --trail: rgba(80, 255, 190, 0.75);
-    --trail2: rgba(80, 255, 190, 0.02);
-  }
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #ffffff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+    }
 
-  html, body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-    background: var(--bg);
-    font-family: Arial, Helvetica, sans-serif;
-  }
+    .container {
+        position: relative;
+        width: 900px;
+        height: 600px;
+    }
 
-  .option {
-    position: absolute;
-    width: 180px;
-    height: 180px;
-    border: 8px solid var(--frame);
-    border-radius: 10px;
-    background: white;
-    box-sizing: border-box;
-    box-shadow: 0 2px 0 rgba(0,0,0,.05);
-    object-fit: cover;
-  }
+    /* Styling the image placeholders to match the grey borders */
+    .placeholder {
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        border: 6px solid #999;
+        border-radius: 8px;
+        background-color: white;
+        object-fit: cover;
+        box-sizing: border-box;
+    }
 
-  #top1 { left: 330px; top: 22px; }
-  #top2 { left: 760px; top: 22px; }
-  #left { left: 40px; top: 255px; }
-  #right { right: 40px; top: 255px; }
+    /* Positioning the placeholders */
+    #ph-left { top: 50%; left: 5%; transform: translateY(-50%); }
+    #ph-top-left { top: 5%; left: 30%; }
+    #ph-top-right { top: 5%; right: 30%; }
+    #ph-right { top: 50%; right: 5%; transform: translateY(-50%); }
 
-  #trail {
-    position: absolute;
-    height: 96px;
-    width: 260px;
-    border-radius: 0 48px 48px 0;
-    background: linear-gradient(90deg, var(--trail2), var(--trail));
-    transform-origin: left center;
-    pointer-events: none;
-    filter: blur(0.2px);
-  }
+    /* The green gradient trail */
+    .trail {
+        position: absolute;
+        top: 50%;
+        left: calc(5% + 140px); /* Starts right after the left placeholder */
+        width: calc(45% - 140px); /* Stretches to the center head */
+        height: 100px;
+        transform: translateY(-50%);
+        background: linear-gradient(to right, rgba(50, 200, 150, 0), rgba(50, 180, 130, 0.9));
+        z-index: 1;
+    }
 
-  #head {
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    background: #fff;
-    border: 5px solid #000;
-    border-radius: 4px;
-    box-sizing: border-box;
-    pointer-events: none;
-    transform-origin: center center;
-    box-shadow: 0 2px 0 rgba(0,0,0,.05);
-  }
+    /* Container for the head to keep it centered while rotating */
+    .head-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120px;
+        height: 120px;
+        z-index: 2;
+    }
 
-  .eye {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background: #000;
-    border-radius: 50%;
-    top: 36px;
-  }
-  #e1 { left: 34px; }
-  #e2 { right: 34px; }
+    /* The Head styling */
+    .head {
+        width: 100%;
+        height: 100%;
+        border: 4px solid black;
+        background-color: white;
+        border-radius: 4px;
+        position: relative;
+        box-sizing: border-box;
+        /* Will be rotated by JS */
+        transform-origin: center center; 
+    }
 
-  #mouth {
-    position: absolute;
-    left: 31px;
-    top: 63px;
-    width: 54px;
-    height: 28px;
-    border-bottom: 6px solid #000;
-    border-radius: 0 0 60px 60px;
-  }
+    /* Drawing the face */
+    .eye {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: black;
+        border-radius: 50%;
+        top: 35%;
+    }
+    .eye.left { left: 30%; }
+    .eye.right { right: 30%; }
+    
+    .mouth {
+        position: absolute;
+        bottom: 25%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 15px;
+        border-bottom: 4px solid black;
+        border-radius: 0 0 40px 40px;
+    }
 
-  /* pointer arrow inside the head */
-  #pointer {
-    position: absolute;
-    left: 50%;
-    top: 13px;
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 14px solid #000;
-    transform-origin: 50% 36px;
-    transform: translateX(-50%) rotate(0deg);
-  }
+    /* Recreating the bottom decorative logo */
+    .bottom-logo {
+        position: absolute;
+        bottom: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-  #hint {
-    position: absolute;
-    left: 14px;
-    top: 10px;
-    font-size: 14px;
-    color: #444;
-    user-select: none;
-  }
+    /* Making a rough approximation of the geometric logo */
+    .bottom-logo::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 4px solid transparent;
+        border-top: 4px solid #aaa;
+        border-bottom: 4px solid #aaa;
+        transform: rotate(45deg);
+    }
+    .bottom-logo::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border: 4px solid transparent;
+        border-left: 4px solid #aaa;
+        border-right: 4px solid #aaa;
+        transform: rotate(45deg);
+    }
+    .logo-dot {
+        width: 16px;
+        height: 16px;
+        background-color: #aaa;
+        border-radius: 50%;
+        z-index: 3;
+    }
+
 </style>
 </head>
 <body>
 
-<div id="hint">Move your mouse — the head points to it.</div>
+<div class="container">
+    <div class="trail"></div>
 
-<img class="option" id="top1" alt="placeholder 1" />
-<img class="option" id="top2" alt="placeholder 2" />
-<img class="option" id="left" alt="placeholder 3" />
-<img class="option" id="right" alt="placeholder 4" />
+    <img src="https://via.placeholder.com/140/ffffff/555555?text=Place+holder" class="placeholder" id="ph-left" alt="Left Placeholder">
+    <img src="https://via.placeholder.com/140/ffffff/555555?text=Place+holder" class="placeholder" id="ph-top-left" alt="Top Left Placeholder">
+    <img src="https://via.placeholder.com/140/ffffff/555555?text=Place+holder" class="placeholder" id="ph-top-right" alt="Top Right Placeholder">
+    <img src="https://via.placeholder.com/140/ffffff/555555?text=Place+holder" class="placeholder" id="ph-right" alt="Right Placeholder">
 
-<div id="trail"></div>
+    <div class="head-container" id="head-container">
+        <div class="head" id="head">
+            <div class="eye left"></div>
+            <div class="eye right"></div>
+            <div class="mouth"></div>
+        </div>
+    </div>
 
-<div id="head">
-  <div id="pointer"></div>
-  <div class="eye" id="e1"></div>
-  <div class="eye" id="e2"></div>
-  <div id="mouth"></div>
+    <div class="bottom-logo">
+        <div class="logo-dot"></div>
+    </div>
 </div>
 
 <script>
-  // Inline SVG placeholders (no broken image icons)
-  const placeholderSVG = (label) => `
-    <svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
-      <rect x="0" y="0" width="180" height="180" rx="6" fill="#fff"/>
-      <rect x="0" y="0" width="180" height="180" rx="6" fill="none" stroke="#a6a6a6" stroke-width="8"/>
-      <g transform="translate(47,42)" fill="none" stroke="#c1c1c1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="0" y="0" width="86" height="56" rx="3"/>
-        <circle cx="63" cy="18" r="8" fill="#c1c1c1" stroke="none"/>
-        <path d="M2 54 L27 28 L45 47 L58 35 L84 54"/>
-      </g>
-      <text x="90" y="128" text-anchor="middle" font-size="30" font-family="Arial, Helvetica, sans-serif" fill="#6f6f6f">Place</text>
-      <text x="90" y="160" text-anchor="middle" font-size="30" font-family="Arial, Helvetica, sans-serif" fill="#6f6f6f">holder</text>
-    </svg>
-  `;
+    const head = document.getElementById('head');
+    const headContainer = document.getElementById('head-container');
 
-  const makeDataURL = (svg) =>
-    'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
-
-  document.getElementById('top1').src = makeDataURL(placeholderSVG('1'));
-  document.getElementById('top2').src = makeDataURL(placeholderSVG('2'));
-  document.getElementById('left').src  = makeDataURL(placeholderSVG('3'));
-  document.getElementById('right').src = makeDataURL(placeholderSVG('4'));
-
-  const head = document.getElementById('head');
-  const trail = document.getElementById('trail');
-  const pointer = document.getElementById('pointer');
-
-  // Start position near center
-  let hx = window.innerWidth * 0.45;
-  let hy = window.innerHeight * 0.42;
-  let tx = hx;
-  let ty = hy;
-
-  let mouseX = hx;
-  let mouseY = hy;
-
-  function render() {
-    // Smooth follow
-    hx += (mouseX - hx) * 0.12;
-    hy += (mouseY - hy) * 0.12;
-
-    const dx = mouseX - hx;
-    const dy = mouseY - hy;
-    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-
-    // Head position
-    head.style.left = (hx - 60) + 'px';
-    head.style.top  = (hy - 60) + 'px';
-
-    // Point the arrow toward the cursor
-    pointer.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-
-    // Trail from previous point to current point
-    const dist = Math.hypot(hx - tx, hy - ty);
-    const trailAngle = Math.atan2(hy - ty, hx - tx) * 180 / Math.PI;
-
-    trail.style.left = tx + 'px';
-    trail.style.top = (ty - 48) + 'px';
-    trail.style.width = Math.max(120, dist) + 'px';
-    trail.style.transform = `rotate(${trailAngle}deg)`;
-
-    // Update trail start for next frame
-    tx += (hx - tx) * 0.22;
-    ty += (hy - ty) * 0.22;
-
-    requestAnimationFrame(render);
-  }
-
-  document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
-
-  // Touch support
-  document.addEventListener('touchmove', (e) => {
-    if (!e.touches.length) return;
-    mouseX = e.touches[0].clientX;
-    mouseY = e.touches[0].clientY;
-  }, { passive: true });
-
-  render();
+    document.addEventListener('mousemove', (e) => {
+        // Get the position of the head container relative to the viewport
+        const rect = headContainer.getBoundingClientRect();
+        
+        // Calculate the absolute center coordinates of the head
+        const headCenterX = rect.left + (rect.width / 2);
+        const headCenterY = rect.top + (rect.height / 2);
+        
+        // Calculate the distance from the head's center to the mouse cursor
+        const deltaX = e.clientX - headCenterX;
+        const deltaY = e.clientY - headCenterY;
+        
+        // Calculate the angle using atan2 (returns radians)
+        const angleRadians = Math.atan2(deltaY, deltaX);
+        
+        // Convert radians to degrees. 
+        // We add 90 degrees because the face is drawn pointing "up" (0 degrees standard rotation),
+        // but atan2 assumes 0 degrees is pointing right along the X-axis.
+        const angleDegrees = (angleRadians * (180 / Math.PI)) + 90;
+        
+        // Apply the rotation dynamically
+        head.style.transform = `rotate(${angleDegrees}deg)`;
+    });
 </script>
 
 </body>
