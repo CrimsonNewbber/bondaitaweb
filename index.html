@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bondaita — Imagine. Create. Play.</title>
+<link rel="icon" href="assets/icon.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+:root{
+--primary:#00CC66;
+--primary-dark:#00a352;
+--primary-light:#5aff9d;
+--secondary:#0066FF;
+--accent:#FF6600;
+--danger:#FF3333;
+--warning:#FFB800;
+--bg:#f5f7f8;
+--surface:#ffffff;
+--surface-2:#f0f2f5;
+--surface-3:#e6e9ee;
+--text-primary:#1a1a2e;
+--text-secondary:#5a6175;
+--text-tertiary:#9ca3af;
+--border:#e5e7eb;
+--navbar-bg:#ffffff;
+--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+--shadow-lg:0 10px 30px rgba(0,0,0,.08);
+--green-grad:linear-gradient(135deg,#00CC66 0%,#00994d 100%);
+}
+[data-theme="dark"]{
+--bg:#0f0f1a;
+--surface:#1a1a2e;
+--surface-2:#252540;
+--surface-3:#2d2d4a;
+--text-primary:#e5e7eb;
+--text-secondary:#9ca3af;
+--text-tertiary:#6b7280;
+--border:#2d2d4a;
+--navbar-bg:#0a0a15;
+--shadow:0 1px 3px rgba(0,0,0,.3);
+--shadow-lg:0 10px 30px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-primary);min-height:100vh;overflow-x:hidden;transition:background .2s,color .2s}
+a{color:var(--text-primary);text-decoration:none}
+button,input,textarea,select{font-family:inherit}
+button{cursor:pointer;border:none;background:none;color:inherit}
+img{max-width:100%;display:block}
+.currency-icon{width:20px;height:20px;object-fit:contain;vertical-align:middle;display:inline-block}
+.currency-icon-sm{width:16px;height:16px;object-fit:contain;vertical-align:middle;display:inline-block}
+.currency-icon-lg{width:28px;height:28px;object-fit:contain;vertical-align:middle;display:inline-block}
+.currency-icon-xl{width:44px;height:44px;object-fit:contain;vertical-align:middle;display:inline-block}
+.brand-logo{width:36px;height:36px;border-radius:10px;background:var(--green-grad);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:18px;flex-shrink:0}
+
+#app{min-height:100vh;padding-top:64px}
+.page{max-width:1200px;margin:0 auto;padding:24px 20px}
+.page-narrow{max-width:420px;margin:0 auto}
+
+/* Navbar */
+#navbar{position:fixed;top:0;left:0;right:0;height:64px;background:var(--navbar-bg);border-bottom:1px solid var(--border);z-index:100;display:none;align-items:center;justify-content:space-between;padding:0 20px;gap:16px;box-shadow:var(--shadow)}
+#navbar.show{display:flex}
+.nav-left,.nav-right{display:flex;align-items:center;gap:8px}
+.nav-brand{font-weight:800;font-size:18px;display:flex;align-items:center;gap:10px;letter-spacing:-.3px}
+.nav-brand img{width:36px;height:36px;border-radius:10px}
+.nav-link{display:flex;align-items:center;gap:6px;color:var(--text-secondary);font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px;transition:.15s}
+.nav-link:hover{color:var(--text-primary);background:var(--surface-2)}
+.nav-link.active{color:var(--primary);background:rgba(0,204,102,.1)}
+.nav-chip{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:18px;background:var(--surface-2);font-size:13px;font-weight:700}
+.nav-btn-primary{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:18px;background:var(--green-grad);color:#fff;font-weight:700;font-size:13px;transition:.15s}
+.nav-btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,204,102,.3)}
+.nav-icon-btn{position:relative;color:var(--text-secondary);padding:8px;border-radius:8px;transition:.15s}
+.nav-icon-btn:hover{color:var(--text-primary);background:var(--surface-2)}
+.nav-user{display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:20px;background:var(--surface-2);cursor:pointer;position:relative;font-weight:600;font-size:13px}
+.nav-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;flex-shrink:0}
+.badge{position:absolute;top:2px;right:2px;background:var(--danger);color:#fff;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:200px;display:none;box-shadow:var(--shadow-lg);z-index:10}
+.dropdown.show{display:block}
+.dropdown-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:14px;cursor:pointer;color:var(--text-primary);transition:.15s}
+.dropdown-item:hover{background:var(--surface-2)}
+.dropdown-item.danger{color:var(--danger)}
+.mobile-toggle{display:none;color:var(--text-primary);padding:8px;border-radius:8px}
+.mobile-toggle:hover{background:var(--surface-2)}
+#mobile-menu{position:fixed;top:0;right:-300px;width:300px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:200;padding:20px;transition:right .25s;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
+#mobile-menu.open{right:0}
+#mobile-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:150;display:none}
+#mobile-overlay.show{display:block}
+
+@media(max-width:768px){
+.nav-link,.nav-chip,.nav-btn-primary{display:none}
+.mobile-toggle{display:flex}
+}
+
+/* Cards & containers */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+.card:hover{box-shadow:var(--shadow-lg)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:700;transition:.15s;border:none;white-space:nowrap}
+.btn-primary{background:var(--green-grad);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,204,102,.3)}
+.btn-secondary{background:var(--surface-2);color:var(--text-primary);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface-3)}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--text-primary)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-icon{padding:8px;border-radius:8px}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-lg{padding:14px 28px;font-size:16px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text-primary);font-size:14px;transition:.15s}
+.form-input:focus{border-color:var(--primary);outline:none}
+textarea.form-input{resize:vertical;min-height:80px}
+[data-theme="dark"] .form-input{background:var(--surface-2)}
+
+/* Toast */
+#toast-container{position:fixed;top:80px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px;max-width:360px}
+.toast{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;font-size:14px;animation:toastIn .25s;backdrop-filter:blur(8px)}
+.toast.out{animation:toastOut .25s forwards}
+.toast.error{border-left-color:var(--danger)}
+.toast.info{border-left-color:var(--secondary)}
+@keyframes toastIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes toastOut{to{transform:translateX(100%);opacity:0}}
+
+/* Modal */
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+#modal.show{display:flex}
+.modal-box{background:var(--surface);border-radius:16px;padding:24px;max-width:440px;width:100%;max-height:90vh;overflow-y:auto;animation:scaleIn .2s;box-shadow:var(--shadow-lg)}
+@keyframes scaleIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
+.modal-header h3{font-size:18px;font-weight:800}
+.modal-close{color:var(--text-tertiary);padding:6px;border-radius:6px}
+.modal-close:hover{color:var(--text-primary);background:var(--surface-2)}
+
+/* Grids */
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.grid-4{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+
+/* Game card */
+.game-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:.2s;box-shadow:var(--shadow)}
+.game-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--primary)}
+.game-thumb{height:130px;position:relative;display:flex;align-items:flex-end;padding:10px}
+.game-badge{background:rgba(0,0,0,.7);color:#fff;padding:4px 8px;border-radius:8px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px;backdrop-filter:blur(4px)}
+.game-info{padding:12px}
+.game-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.game-meta{font-size:12px;color:var(--text-secondary);margin-top:2px}
+
+/* Item card */
+.item-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:.2s;box-shadow:var(--shadow)}
+.item-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--primary)}
+.item-thumb{aspect-ratio:1;position:relative}
+.item-info{padding:12px}
+.item-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-price{font-size:13px;font-weight:800;display:flex;align-items:center;gap:4px;margin-top:4px;color:var(--primary)}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto}
+.tab{padding:10px 16px;font-size:14px;font-weight:600;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;cursor:pointer;transition:.15s}
+.tab:hover{color:var(--text-primary)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+
+/* Utility */
+.flex{display:flex}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}
+.text-center{text-align:center}.text-sm{font-size:13px}.text-xs{font-size:12px}.text-lg{font-size:18px}.text-xl{font-size:24px}.text-2xl{font-size:32px}
+.font-bold{font-weight:700}.font-semibold{font-weight:600}
+.text-secondary{color:var(--text-secondary)}.text-tertiary{color:var(--text-tertiary)}
+.mt-1{margin-top:4px}.mt-2{margin-top:8px}.mt-3{margin-top:12px}.mt-4{margin-top:16px}.mt-6{margin-top:24px}
+.mb-2{margin-bottom:8px}.mb-4{margin-bottom:16px}.mb-6{margin-bottom:24px}
+.p-4{padding:16px}.p-6{padding:24px}
+.w-full{width:100%}.hidden{display:none!important}
+.truncate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.online-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);display:inline-block;flex-shrink:0}
+.row-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;flex-shrink:0}
+
+/* Landing */
+.landing-nav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:50;background:rgba(245,247,248,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.landing-hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 20px 80px;text-align:center;position:relative;overflow:hidden;background:linear-gradient(180deg,var(--bg) 0%,var(--surface-2) 100%)}
+.landing-hero::before{content:'';position:absolute;top:20%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(0,204,102,.15),transparent 60%);pointer-events:none}
+.landing-hero>div{position:relative;z-index:1;max-width:720px}
+.landing h1{font-size:clamp(36px,6vw,60px);font-weight:900;line-height:1.05;margin-bottom:16px;letter-spacing:-1.5px}
+.landing h1 span{background:var(--green-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.landing p{font-size:clamp(16px,2vw,19px);color:var(--text-secondary);max-width:560px;margin:0 auto 32px;line-height:1.6}
+.landing-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.landing-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:20px;max-width:600px;margin:60px auto 0;padding-top:40px;border-top:1px solid var(--border)}
+.landing-stat-num{font-size:28px;font-weight:900;color:var(--primary)}
+.landing-section{padding:80px 20px;background:var(--surface)}
+.landing-footer{padding:40px 20px;border-top:1px solid var(--border);text-align:center;color:var(--text-secondary);font-size:14px}
+.feature-card{text-align:center;padding:32px 20px}
+.feature-icon{width:56px;height:56px;border-radius:14px;background:rgba(0,204,102,.1);color:var(--primary);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px}
+
+/* Currency page */
+.balance-card{display:flex;align-items:center;gap:16px;padding:20px;border-radius:14px;background:var(--surface);border:1px solid var(--border)}
+.balance-amount{font-size:32px;font-weight:900;line-height:1}
+.exchange-box{background:var(--surface);border:2px solid var(--primary);border-radius:16px;padding:24px;position:relative;overflow:hidden}
+.exchange-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--green-grad)}
+.quick-btn{padding:8px 12px;border-radius:8px;background:var(--surface-2);border:1px solid var(--border);font-size:12px;font-weight:700;transition:.15s;display:inline-flex;align-items:center;gap:4px}
+.quick-btn:hover:not(:disabled){border-color:var(--primary);background:rgba(0,204,102,.08)}
+.quick-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Profile */
+.profile-banner{height:160px;border-radius:14px;margin-bottom:-50px;position:relative;overflow:hidden}
+.profile-avatar-lg{width:100px;height:100px;border-radius:50%;border:4px solid var(--bg);margin-left:24px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:32px;font-weight:900;position:relative;z-index:2}
+
+/* Messages */
+.msg-layout{display:flex;height:calc(100vh - 110px);border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--surface)}
+.msg-list{width:300px;border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0}
+.msg-row{padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:.15s}
+.msg-row:hover,.msg-row.active{background:var(--surface-2)}
+.msg-panel{flex:1;display:flex;flex-direction:column;min-width:0}
+.msg-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
+.msg-bubble{max-width:75%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.4;word-wrap:break-word}
+.msg-bubble.sent{background:var(--primary);color:#fff;margin-left:auto;border-bottom-right-radius:4px}
+.msg-bubble.received{background:var(--surface-2);border-bottom-left-radius:4px}
+
+/* Avatar */
+.avatar-preview{width:220px;height:300px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto}
+.color-swatch{width:32px;height:32px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:.15s}
+.color-swatch.active{border-color:var(--text-primary);transform:scale(1.1)}
+.color-swatch:hover{transform:scale(1.1)}
+
+@media(max-width:768px){
+.grid-2,.grid-3{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.grid-4{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.msg-list{width:100%}
+.msg-panel{display:none}
+.msg-layout.chat-open .msg-list{display:none}
+.msg-layout.chat-open .msg-panel{display:flex}
+.profile-banner{height:120px;margin-bottom:-40px}
+.profile-avatar-lg{width:80px;height:80px;font-size:24px;margin-left:16px}
+}
+</style>
+</head>
+<body>
+<nav id="navbar"></nav>
+<div id="mobile-overlay" onclick="closeMobileMenu()"></div>
+<div id="mobile-menu"></div>
+<div id="app"></div>
+<div id="toast-container"></div>
+<div id="modal" onclick="if(event.target===this)closeModal()"></div>
+
+<script>
+/* ============= ICONS ============= */
+const svg=(paths,fill=false)=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="${fill?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+const Icons={
+home:()=>svg('<path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/>'),
+gamepad:()=>svg('<rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M8 15h8"/>'),
+catalog:()=>svg('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),
+create:()=>svg('<path d="M12 5v14M5 12h14"/>'),
+avatar:()=>svg('<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/>'),
+search:()=>svg('<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'),
+user:()=>svg('<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>'),
+users:()=>svg('<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>'),
+message:()=>svg('<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>'),
+group:()=>svg('<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>'),
+settings:()=>svg('<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>'),
+exchange:()=>svg('<polyline points="17 1 21 5 17 9"/><line x1="3" y1="5" x2="21" y2="5"/><polyline points="7 23 3 19 7 15"/><line x1="21" y1="19" x2="3" y2="19"/>'),
+bell:()=>svg('<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>'),
+logout:()=>svg('<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>'),
+play:()=>svg('<polygon points="5 3 19 12 5 21 5 3"/>',true),
+like:()=>svg('<path d="M14 9V5a3 3 0 00-6 0v1H5a2 2 0 00-2 2v1l1.5 8A2 2 0 006.5 19H14a2 2 0 002-2V9z"/><path d="M18 9h2a2 2 0 012 2v7a2 2 0 01-2 2h-2V9z"/>'),
+favorite:()=>svg('<path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>'),
+share:()=>svg('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>'),
+close:()=>svg('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'),
+plus:()=>svg('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'),
+check:()=>svg('<polyline points="20 6 9 17 4 12"/>'),
+send:()=>svg('<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>'),
+chart:()=>svg('<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>'),
+edit:()=>svg('<path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>'),
+delete:()=>svg('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>'),
+lock:()=>svg('<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>'),
+shield:()=>svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'),
+palette:()=>svg('<circle cx="13.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="17.5" cy="10.5" r="1.5" fill="currentColor" stroke="none"/><circle cx="8.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/>'),
+star:()=>svg('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'),
+sparkle:()=>svg('<path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/>'),
+trophy:()=>svg('<path d="M6 9H3a1 1 0 01-1-1V4a1 1 0 011-1h3M18 9h3a1 1 0 001-1V4a1 1 0 00-1-1h-3"/><path d="M6 3h12v7a6 6 0 01-12 0V3z"/><path d="M9 21h6"/><path d="M12 16v5"/>'),
+menu:()=>svg('<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>'),
+filter:()=>svg('<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>'),
+download:()=>svg('<path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>'),
+sun:()=>svg('<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'),
+moon:()=>svg('<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>'),
+flame:()=>svg('<path d="M12 22c4.97 0 8-3.58 8-8 0-3.07-2.27-5.64-4-7.5-.67-.72-1.25-1.36-1.7-2C13.7 3.6 12.98 2 12 2c-.4 0-1 .5-1 1.5 0 .83.33 1.73 0 2.5-.5 1.17-2 2-3 3.5C6.5 11.5 4 13.5 4 16.5 4 19.58 7.03 22 12 22z"/>'),
+google:()=>'<svg viewBox="0 0 24 24" width="20" height="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>',
+};
+
+/* ============= STATE ============= */
+let currentUser=null,userData=null;
+const SKEY='bondaita_state';
+
+function loadState(){
+try{
+const raw=localStorage.getItem(SKEY);
+if(raw){const s=JSON.parse(raw);currentUser=s.currentUser;userData=s.userData}
+}catch(e){}
+}
+function saveState(){
+if(currentUser){
+localStorage.setItem(SKEY,JSON.stringify({currentUser,userData}));
+if(userData)saveUserData(userData);
+}
+}
+function clearState(){localStorage.removeItem(SKEY);currentUser=null;userData=null}
+
+/* ============= UTILITIES ============= */
+const $=id=>document.getElementById(id);
+const userColor=name=>{let h=0;for(let c of name||'x')h=(h*31+c.charCodeAt(0))%360;return `hsl(${h},65%,50%)`};
+const formatNum=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(n);
+const nowIso=()=>new Date().toISOString().split('T')[0];
+
+function toast(msg,type='success'){
+const t=document.createElement('div');t.className=`toast ${type==='error'?'error':type==='info'?'info':''}`;
+const icon=type==='error'?'✕':type==='info'?'ℹ':'✓';
+t.innerHTML=`<span style="color:${type==='error'?'var(--danger)':type==='info'?'var(--secondary)':'var(--primary)'};font-weight:900">${icon}</span><span>${msg}</span>`;
+$('toast-container').appendChild(t);
+setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),250)},3000);
+}
+function currencyToast(msg,type,curr){
+const t=document.createElement('div');t.className=`toast ${type==='error'?'error':''}`;
+const icon=curr==='bonds'?'<img src="assets/bond.png" class="currency-icon">':'<img src="assets/stud.png" class="currency-icon">';
+t.innerHTML=`${icon}<span>${msg}</span>`;
+$('toast-container').appendChild(t);
+setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),250)},3000);
+}
+function openModal(html){$('modal').innerHTML='<div class="modal-box">'+html+'</div>';$('modal').classList.add('show')}
+function closeModal(){$('modal').classList.remove('show')}
+window.closeModal=closeModal;
+window.toast=toast;window.currencyToast=currencyToast;
+
+/* ============= DATA ============= */
+let games=loadGames();
+let catalog=[
+{id:'i1',name:'Cool Shades',type:'Face',price:15,creator:'Pixel'},
+{id:'i2',name:'Dragon Helm',type:'Hat',price:75,creator:'Quest'},
+{id:'i3',name:'Neon Shirt',type:'Shirt',price:10,creator:'Glow'},
+{id:'i4',name:'Space Pants',type:'Pants',price:12,creator:'Cosmic'},
+{id:'i5',name:'Angel Wings',type:'Accessory',price:120,creator:'Sky'},
+{id:'i6',name:'Happy Face',type:'Face',price:0,creator:'Bondaita'},
+{id:'i7',name:'Royal Crown',type:'Hat',price:250,creator:'Royal'},
+{id:'i8',name:'Fire Jacket',type:'Shirt',price:45,creator:'Blaze'},
+{id:'i9',name:'Pixel Shades',type:'Face',price:8,creator:'Retro'},
+{id:'i10',name:'Galaxy Cape',type:'Accessory',price:90,creator:'Cosmic'}
+];
+const fakeUsers=['ShadowX','Nitro','Ghost','BizKid','Star','Cute','Blade','Jump'];
+const genres=['All','Adventure','Racing','Horror','Tycoon','Simulator','Fighting','Obby'];
+
+function loadGames(){
+try{return JSON.parse(localStorage.getItem('bondaita_games')||'[]')}catch(e){return[]}
+}
+function saveGames(){localStorage.setItem('bondaita_games',JSON.stringify(games))}
+
+/* ============= ROUTER ============= */
+const routes={};
+function route(path,fn){routes[path]=fn}
+function navigate(hash){window.location.hash=hash}
+window.navigate=navigate;
+
+function matchRoute(hash){
+const path=hash.replace('#','')||'/';
+if(routes[path])return{fn:routes[path],params:{}};
+for(let r in routes){
+const rp=r.split('/'),pp=path.split('/');
+if(rp.length!==pp.length)continue;
+const params={};let ok=true;
+for(let i=0;i<rp.length;i++){
+if(rp[i].startsWith(':'))params[rp[i].slice(1)]=pp[i];
+else if(rp[i]!==pp[i]){ok=false;break}
+}
+if(ok)return{fn:routes[r],params};
+}
+return null;
+}
+
+function render(){
+const hash=window.location.hash||'#/';
+const path=hash.replace('#','');
+const authPrefixes=['/discover','/game/','/profile/','/avatar','/catalog','/friends','/messages','/groups','/create','/settings','/currency','/search','/notifications'];
+if(!currentUser&&authPrefixes.some(p=>path.startsWith(p))){navigate('#/login');return}
+if(currentUser&&(path==='/login'||path==='/signup')){navigate('#/discover');return}
+const m=matchRoute(hash);
+if(m){renderNav();m.fn(m.params)}
+else render404();
+}
+window.addEventListener('hashchange',render);
+
+/* ============= NAVBAR ============= */
+function renderNav(){
+const nav=$('navbar');
+if(!currentUser){nav.className='';nav.innerHTML='';return}
+nav.className='show';
+const u=userData;
+const initial=(u.username||'U').slice(0,2).toUpperCase();
+const unread=(u.notifications||[]).filter(n=>!n.read).length;
+nav.innerHTML=`
+<div class="nav-left">
+<a href="#/discover" class="nav-brand">
+<img src="assets/icon.png" alt="B" onerror="this.outerHTML='<span class=&quot;brand-logo&quot;>B</span>'">
+<span>Bondaita</span>
+</a>
+<a href="#/discover" class="nav-link ${location.hash.includes('discover')?'active':''}">${Icons.home()} Discover</a>
+<a href="#/catalog" class="nav-link ${location.hash.includes('catalog')?'active':''}">${Icons.catalog()} Catalog</a>
+<a href="#/create" class="nav-link ${location.hash.includes('create')?'active':''}">${Icons.create()} Create</a>
+<a href="#/avatar" class="nav-link ${location.hash.includes('avatar')?'active':''}">${Icons.avatar()} Avatar</a>
+</div>
+<div class="nav-right">
+<div class="nav-chip"><img src="assets/bond.png" class="currency-icon-sm"> ${u.bonds}</div>
+<div class="nav-chip"><img src="assets/stud.png" class="currency-icon-sm"> ${u.studs}</div>
+<a href="#/currency" class="nav-btn-primary">${Icons.exchange()} Exchange</a>
+<a href="#/notifications" class="nav-icon-btn">${Icons.bell()}${unread?`<span class="badge">${unread}</span>`:''}</a>
+<div class="nav-user" onclick="event.stopPropagation();document.getElementById('dd').classList.toggle('show')">
+<div class="nav-avatar" style="background:${userColor(u.username)}">${initial}</div>
+<span class="truncate" style="max-width:100px">${u.username}</span>
+<div class="dropdown" id="dd">
+<a href="#/profile/me" class="dropdown-item">${Icons.user()} Profile</a>
+<a href="#/friends" class="dropdown-item">${Icons.users()} Friends</a>
+<a href="#/messages" class="dropdown-item">${Icons.message()} Messages</a>
+<a href="#/settings" class="dropdown-item">${Icons.settings()} Settings</a>
+<div class="dropdown-item" onclick="toggleTheme()">${document.documentElement.dataset.theme==='dark'?Icons.sun():Icons.moon()} Theme</div>
+<div class="dropdown-item danger" onclick="doLogout()">${Icons.logout()} Logout</div>
+</div>
+</div>
+<button class="mobile-toggle" onclick="openMobileMenu()">${Icons.menu()}</button>
+</div>`;
+renderMobileMenu();
+}
+function renderMobileMenu(){
+const m=$('mobile-menu');const u=userData;
+if(!currentUser){m.innerHTML='';return}
+const unread=(u.notifications||[]).filter(n=>!n.read).length;
+m.innerHTML=`
+<div class="flex justify-between items-center mb-4">
+<div class="flex items-center gap-2">
+<div class="nav-avatar" style="background:${userColor(u.username)};width:36px;height:36px">${(u.username||'U').slice(0,2).toUpperCase()}</div>
+<div><div class="font-semibold">${u.username}</div><div class="text-xs text-secondary">Level ${Math.floor((u.bonds||0)/10)+1}</div></div>
+</div>
+<button onclick="closeMobileMenu()" class="btn-icon" style="color:var(--text-primary)">${Icons.close()}</button>
+</div>
+<div class="flex gap-2 mb-4">
+<div class="nav-chip flex-1 justify-center"><img src="assets/bond.png" class="currency-icon-sm"> ${u.bonds}</div>
+<div class="nav-chip flex-1 justify-center"><img src="assets/stud.png" class="currency-icon-sm"> ${u.studs}</div>
+</div>
+<a href="#/discover" class="dropdown-item" onclick="closeMobileMenu()">${Icons.home()} Discover</a>
+<a href="#/catalog" class="dropdown-item" onclick="closeMobileMenu()">${Icons.catalog()} Catalog</a>
+<a href="#/create" class="dropdown-item" onclick="closeMobileMenu()">${Icons.create()} Create</a>
+<a href="#/avatar" class="dropdown-item" onclick="closeMobileMenu()">${Icons.avatar()} Avatar</a>
+<a href="#/friends" class="dropdown-item" onclick="closeMobileMenu()">${Icons.users()} Friends</a>
+<a href="#/messages" class="dropdown-item" onclick="closeMobileMenu()">${Icons.message()} Messages</a>
+<a href="#/groups" class="dropdown-item" onclick="closeMobileMenu()">${Icons.group()} Groups</a>
+<a href="#/currency" class="dropdown-item" onclick="closeMobileMenu()">${Icons.exchange()} Currency</a>
+<a href="#/notifications" class="dropdown-item" onclick="closeMobileMenu()">${Icons.bell()} Notifications ${unread?`<span style="margin-left:auto;color:var(--danger)">${unread}</span>`:''}</a>
+<a href="#/settings" class="dropdown-item" onclick="closeMobileMenu()">${Icons.settings()} Settings</a>
+<div class="mt-4">
+<button class="btn btn-secondary w-full" onclick="toggleTheme();closeMobileMenu()">${Icons.moon()} Toggle Theme</button>
+</div>
+<div class="mt-2">
+<button class="btn btn-danger w-full" onclick="doLogout();closeMobileMenu()">${Icons.logout()} Logout</button>
+</div>`;
+}
+window.openMobileMenu=()=>{$('mobile-menu').classList.add('open');$('mobile-overlay').classList.add('show')};
+window.closeMobileMenu=()=>{$('mobile-menu').classList.remove('open');$('mobile-overlay').classList.remove('show')};
+window.doLogout=()=>{clearState();navigate('#/');render();toast('Logged out','info')};
+window.toggleTheme=()=>{
+const html=document.documentElement;
+const next=html.dataset.theme==='dark'?'light':'dark';
+html.dataset.theme=next;localStorage.setItem('bondaita_theme',next);renderNav();
+};
+document.addEventListener('click',e=>{const d=$('dd');if(d&&!e.target.closest('.nav-user'))d.classList.remove('show')});
+const savedTheme=localStorage.getItem('bondaita_theme');
+if(savedTheme)document.documentElement.dataset.theme=savedTheme;
+
+/* ============= LANDING ============= */
+route('/',()=>{
+$('navbar').className='';
+$('app').innerHTML=`
+<div class="landing">
+<div class="landing-nav">
+<a href="#/" class="nav-brand">
+<img src="assets/icon.png" alt="B" onerror="this.outerHTML='<span class=&quot;brand-logo&quot;>B</span>'">
+<span>Bondaita</span>
+</a>
+<div class="flex gap-2">
+<a href="#/login" class="btn btn-secondary btn-sm">Sign In</a>
+<a href="#/signup" class="btn btn-primary btn-sm">Sign Up</a>
+</div>
+</div>
+<div class="landing-hero">
+<div>
+<img src="assets/icon.png" alt="Bondaita" style="width:90px;height:90px;border-radius:24px;margin:0 auto 24px;box-shadow:0 12px 40px rgba(0,204,102,.3);display:block" onerror="this.outerHTML='<div class=&quot;brand-logo&quot; style=&quot;width:90px;height:90px;border-radius:24px;font-size:42px;margin:0 auto 24px&quot;>B</div>'">
+<h1>Imagine. Create. <span>Play.</span></h1>
+<p>The next-generation gaming platform. Build your own games, customize your avatar, and play with millions of players.</p>
+<div class="landing-cta">
+<a href="#/signup" class="btn btn-primary btn-lg">${Icons.sparkle()} Get Started Free</a>
+<a href="#/login" class="btn btn-outline btn-lg">${Icons.play()} Sign In</a>
+</div>
+<div class="landing-stats">
+<div><div class="landing-stat-num">Create</div><div class="text-sm text-secondary">Your own games</div></div>
+<div><div class="landing-stat-num">Play</div><div class="text-sm text-secondary">Community worlds</div></div>
+<div><div class="landing-stat-num">Earn</div><div class="text-sm text-secondary">Stud rewards</div></div>
+<div><div class="landing-stat-num">Trade</div><div class="text-sm text-secondary">Studs for Bonds</div></div>
+</div>
+</div>
+</div>
+<div class="landing-section">
+<div style="max-width:1100px;margin:0 auto">
+<h2 class="text-center text-xl font-bold mb-6">Why Bondaita?</h2>
+<div class="grid grid-3">
+${[
+{icon:'gamepad',t:'Play Games',d:'Discover thousands of player-created games across every genre.'},
+{icon:'create',t:'Create Worlds',d:'Build your own games with our powerful creator tools.'},
+{icon:'users',t:'Make Friends',d:'Join a community of millions of players and creators.'},
+{icon:'trophy',t:'Earn Rewards',d:'Earn Studs through daily logins, achievements, and milestones.'},
+{icon:'palette',t:'Express Yourself',d:'Customize your avatar with thousands of unique items.'},
+{icon:'shield',t:'Safe & Secure',d:'Advanced moderation and safety features for all ages.'}
+].map(f=>`<div class="card feature-card"><div class="feature-icon">${Icons[f.icon]()}</div><h3 class="font-bold">${f.t}</h3><p class="text-sm text-secondary mt-2">${f.d}</p></div>`).join('')}
+</div>
+</div>
+</div>
+<div class="landing-footer">
+<p>© 2024 Bondaita. Imagine. Create. Play.</p>
+</div>
+</div>`;
+});
+
+/* ============= AUTH PAGES ============= */
+route('/login',()=>{
+$('navbar').className='';
+$('app').innerHTML=authPage('Sign In',`
+<form onsubmit="doLogin(event)">
+<div class="form-group"><label class="form-label">Username</label><input type="text" id="login-user" class="form-input" placeholder="Username" required></div>
+<div class="form-group"><label class="form-label">Password</label><input type="password" id="login-pass" class="form-input" placeholder="Password" required></div>
+<button type="submit" class="btn btn-primary w-full btn-lg">${Icons.lock()} Sign In</button>
+</form>
+<div class="text-center my-4 text-sm text-tertiary">or</div>
+<button class="btn btn-secondary w-full" onclick="doDemo()">${Icons.sparkle()} Try Demo Account</button>
+<p class="text-center text-sm mt-4 text-secondary">No account? <a href="#/signup" style="color:var(--primary);font-weight:600">Sign up</a></p>
+`);
+});
+route('/signup',()=>{
+$('navbar').className='';
+$('app').innerHTML=authPage('Create Account',`
+<form onsubmit="doSignup(event)">
+<div class="form-group"><label class="form-label">Username</label><input type="text" id="signup-user" class="form-input" placeholder="Choose username" required minlength="3" maxlength="20"></div>
+<div class="form-group"><label class="form-label">Password</label><input type="password" id="signup-pass" class="form-input" placeholder="Min 6 characters" required minlength="6"></div>
+<div class="card mb-4" style="background:rgba(0,204,102,.05);border-color:rgba(0,204,102,.2);padding:12px;display:flex;align-items:center;gap:10px">
+<img src="assets/stud.png" class="currency-icon-lg">
+<div class="text-sm"><strong>Get 50 Studs free</strong> when you sign up — exchange them for 5 Bonds!</div>
+</div>
+<button type="submit" class="btn btn-primary w-full btn-lg">${Icons.sparkle()} Create Account</button>
+</form>
+<p class="text-center text-sm mt-4 text-secondary">Have an account? <a href="#/login" style="color:var(--primary);font-weight:600">Sign in</a></p>
+`);
+});
+function authPage(title,body){
+return`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px">
+<div class="card page-narrow w-full" style="padding:32px">
+<div class="text-center mb-6">
+<div class="brand-logo" style="width:56px;height:56px;border-radius:16px;font-size:24px;margin:0 auto 16px">B</div>
+<h2 class="text-xl font-bold">${title}</h2>
+<p class="text-secondary text-sm mt-1">${title==='Sign In'?'Welcome back to Bondaita':'Join the Bondaita community'}</p>
+</div>
+${body}
+</div>
+</div>`;
+}
+
+window.doLogin=(e)=>{
+e.preventDefault();
+const u=$('login-user').value.trim(),p=$('login-pass').value;
+if(!u||!p){toast('Fill all fields','error');return}
+const data=loadUserData();
+if(!data||data.username!==u){toast('Invalid credentials','error');return}
+currentUser={uid:'u_'+u,email:u+'@bondaita.local'};
+userData=data;
+addDailyBonus();saveState();navigate('#/discover');render();
+};
+
+window.doSignup=(e)=>{
+e.preventDefault();
+const u=$('signup-user').value.trim();
+if(!/^[a-zA-Z0-9_]+$/.test(u)){toast('Username must be alphanumeric','error');return}
+if(loadUserData()){toast('Account exists. Please sign in.','error');return}
+currentUser={uid:'u_'+u,email:u+'@bondaita.local'};
+userData={
+username:u,displayName:u,bio:'No bio yet.',
+bonds:0,studs:50,loginStreak:1,lastLoginDate:nowIso(),
+avatarConfig:{skin:'#FFD5A0',shirt:'#0066FF',pants:'#1A1A2E'},
+notifications:[{type:'welcome',title:'Welcome to Bondaita!',message:'You have 50 Studs. Exchange them for 5 Bonds!',read:false,time:Date.now()}],
+inventory:[],
+transactions:[{type:'bonus',curr:'studs',desc:'Welcome bonus',amount:50,bal:50,time:Date.now()}]
+};
+saveUserData(userData);
+saveState();
+currencyToast('+50 Studs welcome bonus!','success','studs');
+navigate('#/discover');render();
+};
+
+window.doDemo=()=>{
+const existing=loadUserData();
+if(existing){
+currentUser={uid:'demo',email:'demo@bondaita.local'};
+userData=existing;
+}else{
+currentUser={uid:'demo',email:'demo@bondaita.local'};
+userData={
+username:'DemoPlayer',displayName:'Demo Player',bio:'Demo account',
+bonds:25,studs:120,loginStreak:1,lastLoginDate:'',
+avatarConfig:{skin:'#FFD5A0',shirt:'#0066FF',pants:'#1A1A2E'},
+notifications:[],inventory:[],transactions:[]
+};
+saveUserData(userData);
+}
+addDailyBonus();saveState();navigate('#/discover');render();
+};
+
+function loadUserData(){try{return JSON.parse(localStorage.getItem('bondaita_userData')||'null')}catch(e){return null}}
+function saveUserData(d){localStorage.setItem('bondaita_userData',JSON.stringify(d))}
+
+function addDailyBonus(){
+const today=nowIso();
+if(userData.lastLoginDate===today)return;
+const yest=new Date(Date.now()-86400000).toISOString().split('T')[0];
+if(userData.lastLoginDate===yest)userData.loginStreak++;else userData.loginStreak=1;
+let bonus=10;
+if(userData.loginStreak%7===0)bonus+=50;
+userData.studs+=bonus;
+userData.lastLoginDate=today;
+userData.transactions=userData.transactions||[];
+userData.transactions.unshift({type:'earning',curr:'studs',desc:`Daily login (day ${userData.loginStreak})`,amount:bonus,bal:userData.studs,time:Date.now()});
+currencyToast(`+${bonus} Studs! 🔥 ${userData.loginStreak}-day streak`,'success','studs');
+}
+
+/* ============= DISCOVER ============= */
+route('/discover',()=>{
+$('app').innerHTML=`
+<div class="page">
+<div class="card mb-4" style="background:var(--green-grad);color:#fff;border:none;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+<div><h2 class="text-xl font-bold">Welcome, ${userData.username}! 👋</h2><p style="opacity:.9;margin-top:2px">Ready to discover your next favorite game?</p></div>
+<div class="flex gap-2">
+<a href="#/create" class="btn" style="background:rgba(255,255,255,.2);color:#fff">${Icons.plus()} Create Game</a>
+<a href="#/currency" class="btn" style="background:rgba(255,255,255,.2);color:#fff">${Icons.exchange()} Get Bonds</a>
+</div>
+</div>
+<div class="flex gap-2 mb-4" style="overflow-x:auto;flex-wrap:wrap">
+${genres.map(g=>`<button class="btn btn-sm ${g==='All'?'btn-primary':'btn-secondary'}" onclick="filterGenre('${g}')">${g}</button>`).join('')}
+</div>
+<h3 class="font-bold mb-3 flex items-center gap-2">${Icons.flame()} Player-Created Games</h3>
+<div class="grid grid-4 mb-6" id="discover-grid">
+${games.length?games.map(g=>gameCard(g)).join(''):emptyGamesState('No games have been created yet. Be the first to publish one.')}
+</div>
+${games.length?`<h3 class="font-bold mb-3 flex items-center gap-2">${Icons.star()} Recently Created</h3>
+<div class="grid grid-4">
+${games.slice().reverse().slice(0,4).map(g=>gameCard(g)).join('')}
+</div>`:''}
+</div>`;
+});
+
+function emptyGamesState(message){
+return`<div class="card text-center p-6" style="grid-column:1/-1">
+<div class="feature-icon" style="margin:0 auto 12px">${Icons.create()}</div>
+<h3 class="font-bold mb-2">No Games Yet</h3>
+<p class="text-secondary text-sm mb-4">${message}</p>
+<a href="#/create" class="btn btn-primary">${Icons.plus()} Create a Game</a>
+</div>`;
+}
+
+function gameCard(g){
+const totalVotes=(g.likes||0)+(g.dislikes||0);
+const ratio=totalVotes?Math.round((g.likes||0)/totalVotes*100):100;
+const c1=userColor(g.title),c2=userColor(g.creator);
+return`<div class="game-card" onclick="navigate('#/game/${g.id}')">
+<div class="game-thumb" style="background:linear-gradient(135deg,${c1},${c2})">
+<div class="game-badge">${Icons.play()} ${formatNum(g.players||0)}</div>
+</div>
+<div class="game-info">
+<div class="game-title">${g.title}</div>
+<div class="game-meta">${g.creator} · ${g.genre}</div>
+<div class="game-meta">👍 ${ratio}% · ${formatNum(g.visits||0)} visits</div>
+</div>
+</div>`;
+}
+window.filterGenre=g=>{
+const filtered=g==='All'?games:games.filter(x=>x.genre===g);
+$('discover-grid').innerHTML=filtered.length?filtered.map(gameCard).join(''):emptyGamesState(`No ${g==='All'?'':g+' '}games have been created yet.`);
+};
+
+/* ============= GAME DETAIL ============= */
+route('/game/:id',p=>{
+const g=games.find(x=>x.id===p.id);
+if(!g){
+$('app').innerHTML=`<div class="page"><div class="card text-center p-6"><h2 class="text-xl font-bold mb-2">Game not found</h2><p class="text-secondary mb-4">This game does not exist yet.</p><a href="#/create" class="btn btn-primary">${Icons.plus()} Create a Game</a></div></div>`;
+return;
+}
+const totalVotes=(g.likes||0)+(g.dislikes||0);
+const ratio=totalVotes?Math.round((g.likes||0)/totalVotes*100):100;
+$('app').innerHTML=`
+<div class="page">
+<a href="#/discover" class="text-sm text-secondary mb-3" style="display:inline-flex;align-items:center;gap:4px">← Back to Discover</a>
+<div style="height:280px;border-radius:16px;background:linear-gradient(135deg,${userColor(g.title)},${userColor(g.creator)});display:flex;align-items:center;justify-content:center;margin-bottom:20px;position:relative">
+<button class="btn btn-primary btn-lg" onclick="showLaunchModal()" style="font-size:18px;padding:16px 40px">${Icons.play()} Play Now</button>
+<div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;backdrop-filter:blur(4px)">${Icons.play()} ${formatNum(g.players||0)} playing</div>
+</div>
+<div class="flex justify-between items-start" style="flex-wrap:wrap;gap:16px;margin-bottom:20px">
+<div><h1 class="text-2xl font-bold">${g.title}</h1><p class="text-secondary mt-1">by <a href="#/profile/${g.creator}" style="color:var(--primary);font-weight:600">${g.creator}</a> · ${g.genre}</p></div>
+<div class="flex gap-2">
+<button class="btn btn-secondary btn-sm" onclick="likeGame()">${Icons.like()} Like</button>
+<button class="btn btn-secondary btn-sm" onclick="toast('Added to favorites','success')">${Icons.favorite()} Favorite</button>
+<button class="btn btn-secondary btn-sm" onclick="shareGame('${g.title}')">${Icons.share()}</button>
+</div>
+</div>
+<div class="grid grid-4 mb-4">
+<div class="card text-center"><div class="text-xs text-secondary">PLAYERS</div><div class="text-xl font-bold">${formatNum(g.players||0)}</div></div>
+<div class="card text-center"><div class="text-xs text-secondary">VISITS</div><div class="text-xl font-bold">${formatNum(g.visits||0)}</div></div>
+<div class="card text-center"><div class="text-xs text-secondary">LIKES</div><div class="text-xl font-bold">${ratio}%</div></div>
+<div class="card text-center"><div class="text-xs text-secondary">GENRE</div><div class="text-xl font-bold">${g.genre}</div></div>
+</div>
+<div class="card mb-4">
+<h3 class="font-bold mb-2">About</h3>
+<p class="text-secondary">${g.desc}</p>
+</div>
+<div class="card">
+<h3 class="font-bold mb-3">Game Passes</h3>
+<div class="grid grid-3">
+${[{name:'VIP Pass',desc:'Exclusive perks',price:25},{name:'Speed Boost',desc:'Move 2x faster',price:10},{name:'Mega Pack',desc:'All bonuses',price:50}].map(gp=>`
+<div class="card" style="text-align:center;padding:16px">
+<div class="feature-icon" style="margin:0 auto 12px">${Icons.star()}</div>
+<div class="font-semibold">${gp.name}</div>
+<p class="text-xs text-secondary mt-1">${gp.desc}</p>
+<div class="flex items-center justify-center gap-1 mt-3 font-bold" style="color:var(--primary)"><img src="assets/bond.png" class="currency-icon"> ${gp.price} Bonds</div>
+<button class="btn btn-primary btn-sm w-full mt-3" onclick="buyPass('${gp.name}',${gp.price})">Buy</button>
+</div>`).join('')}
+</div>
+</div>
+</div>`;
+});
+window.likeGame=()=>toast('Liked!','success');
+window.shareGame=t=>{toast('Link copied!','success')};
+window.showLaunchModal=()=>openModal(`<div class="text-center p-2"><div class="feature-icon" style="margin:0 auto 12px">${Icons.download()}</div><h3 class="font-bold mb-2">Launch Game</h3><p class="text-secondary text-sm mb-4">Download the Bondaita client to play user-created games.</p><button class="btn btn-primary w-full">${Icons.download()} Download Client</button></div>`);
+window.buyPass=(name,price)=>{
+if(userData.bonds<price){showInsufficientBonds(price,name);return}
+openModal(`<div class="modal-header"><h3>Confirm Purchase</h3><button class="modal-close" onclick="closeModal()">${Icons.close()}</button></div>
+<div class="text-center p-2">
+<p>Buy <strong>${name}</strong>?</p>
+<div class="flex items-center justify-center gap-2 my-4" style="font-size:28px;font-weight:900;color:var(--primary)"><img src="assets/bond.png" class="currency-icon-lg"> ${price}</div>
+<p class="text-sm text-secondary mb-4">Balance after: ${userData.bonds-price} Bonds</p>
+<button class="btn btn-primary w-full" onclick="confirmPass('${name}',${price})">Confirm Purchase</button>
+</div>`);
+};
+window.confirmPass=(name,price)=>{
+userData.bonds-=price;
+userData.transactions.unshift({type:'purchase',curr:'bonds',desc:`Bought ${name}`,amount:-price,bal:userData.bonds,time:Date.now()});
+saveState();renderNav();closeModal();currencyToast(`Purchased ${name}!`,'success','bonds');
+};
+
+/* ============= CATALOG ============= */
+route('/catalog',()=>{
+$('app').innerHTML=`
+<div class="page">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-xl font-bold flex items-center gap-2">${Icons.catalog()} Catalog</h2>
+<div class="text-sm text-secondary">${catalog.length} items</div>
+</div>
+<div class="flex gap-2 mb-4" style="overflow-x:auto;flex-wrap:wrap">
+${['All','Hat','Shirt','Pants','Face','Accessory'].map(t=>`<button class="btn btn-sm ${t==='All'?'btn-primary':'btn-secondary'}" onclick="filterCat('${t}')">${t}</button>`).join('')}
+</div>
+<div class="grid grid-4" id="cat-grid">
+${catalog.map(itemCard).join('')}
+</div>
+</div>`;
+});
+function itemCard(it){
+const c1=userColor(it.name),c2=userColor(it.creator);
+return`<div class="item-card" onclick="buyItem('${it.id}')">
+<div class="item-thumb" style="background:linear-gradient(135deg,${c1},${c2})">
+${it.price===0?'<div class="game-badge" style="background:var(--primary)">FREE</div>':''}
+</div>
+<div class="item-info">
+<div class="item-name">${it.name}</div>
+<div class="item-price">${it.price===0?'Free':`<img src="assets/bond.png" class="currency-icon-sm"> ${it.price}`}</div>
+<div class="text-xs text-secondary mt-1">by ${it.creator}</div>
+</div>
+</div>`;
+}
+window.filterCat=t=>{
+const filtered=t==='All'?catalog:catalog.filter(x=>x.type===t);
+$('cat-grid').innerHTML=filtered.map(itemCard).join('');
+};
+window.buyItem=id=>{
+const it=catalog.find(x=>x.id===id);
+if(it.price===0){toast(`Got ${it.name} for free!`,'success');return}
+if(userData.bonds<it.price){showInsufficientBonds(it.price,it.name);return}
+openModal(`<div class="modal-header"><h3>Buy ${it.name}</h3><button class="modal-close" onclick="closeModal()">${Icons.close()}</button></div>
+<div class="text-center p-2">
+<div class="text-secondary text-sm">Price</div>
+<div class="flex items-center justify-center gap-2 my-3" style="font-size:28px;font-weight:900;color:var(--primary)"><img src="assets/bond.png" class="currency-icon-lg"> ${it.price}</div>
+<button class="btn btn-primary w-full" onclick="confirmItem('${it.id}')">Confirm</button>
+</div>`);
+};
+window.confirmItem=id=>{
+const it=catalog.find(x=>x.id===id);
+userData.bonds-=it.price;
+userData.inventory=userData.inventory||[];
+userData.inventory.push({id:it.id,name:it.name,type:it.type,time:Date.now()});
+userData.transactions.unshift({type:'purchase',curr:'bonds',desc:`Bought ${it.name}`,amount:-it.price,bal:userData.bonds,time:Date.now()});
+saveState();renderNav();closeModal();currencyToast(`Purchased ${it.name}!`,'success','bonds');
+};
+
+/* ============= PROFILE ============= */
+route('/profile/:id',p=>{
+const isMe=p.id==='me';
+const name=isMe?userData.username:p.id;
+const profileGames=games.filter(g=>g.creator===name);
+const c1=userColor(name),c2=userColor(name+'_');
+$('app').innerHTML=`
+<div class="page">
+<div class="profile-banner" style="background:linear-gradient(135deg,${c1},${c2})"></div>
+<div class="flex items-center gap-4" style="flex-wrap:wrap;margin-bottom:20px">
+<div class="profile-avatar-lg" style="background:${c1}">${name.slice(0,2).toUpperCase()}</div>
+<div style="flex:1;min-width:200px"><h2 class="text-xl font-bold">${name}</h2><p class="text-secondary text-sm">${userData.bio||'No bio yet.'}</p><div class="flex gap-3 mt-2 text-xs text-secondary"><span>${Icons.trophy()} ${Math.floor((userData.bonds||0)/10)+1} level</span><span>${Icons.users()} ${(userData.inventory||[]).length} items</span></div></div>
+${isMe?`<button class="btn btn-secondary" onclick="editProfile()">${Icons.edit()} Edit Profile</button>`:`<button class="btn btn-primary" onclick="toast('Friend request sent!','success')">${Icons.plus()} Add Friend</button>`}
+</div>
+<div class="tabs">
+<button class="tab active" onclick="profileTab('creations',this)">${Icons.gamepad()} Games</button>
+<button class="tab" onclick="profileTab('inventory',this)">${Icons.catalog()} Inventory</button>
+<button class="tab" onclick="profileTab('friends',this)">${Icons.users()} Friends</button>
+</div>
+<div id="profile-content">
+<div class="grid grid-4">${profileGames.length?profileGames.map(gameCard).join(''):emptyGamesState(`${name} has not created any games yet.`)}</div>
+</div>
+</div>`;
+});
+window.profileTab=(tab,btn)=>{
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+if(btn)btn.classList.add('active');
+const c=$('profile-content');
+if(tab==='creations'){
+const name=(location.hash.split('/').pop()==='me')?userData.username:location.hash.split('/').pop();
+const profileGames=games.filter(g=>g.creator===name);
+c.innerHTML=`<div class="grid grid-4">${profileGames.length?profileGames.map(gameCard).join(''):emptyGamesState(`${name} has not created any games yet.`)}</div>`;
+}
+else if(tab==='inventory'){
+const inv=userData.inventory||[];
+c.innerHTML=inv.length?`<div class="grid grid-4">${inv.map(i=>`<div class="item-card"><div class="item-thumb" style="background:linear-gradient(135deg,${userColor(i.name)},${userColor(i.type)})"></div><div class="item-info"><div class="item-name">${i.name}</div><div class="text-xs text-secondary">${i.type}</div></div></div>`).join('')}</div>`:'<div class="card text-center p-6"><p class="text-secondary">No items yet. Visit the Catalog!</p><a href="#/catalog" class="btn btn-primary mt-3">${Icons.catalog()} Browse Catalog</a></div>';
+}
+else c.innerHTML=`<div class="grid grid-2">${fakeUsers.map(u=>`<div class="card flex items-center gap-3"><div class="row-avatar" style="background:${userColor(u)}">${u.slice(0,2).toUpperCase()}</div><div style="flex:1"><div class="font-semibold">${u}</div><div class="text-xs text-secondary flex items-center gap-1"><span class="online-dot"></span> Online</div></div></div>`).join('')}</div>`;
+};
+window.editProfile=()=>{
+openModal(`<div class="modal-header"><h3>Edit Profile</h3><button class="modal-close" onclick="closeModal()">${Icons.close()}</button></div>
+<div class="form-group"><label class="form-label">Display Name</label><input type="text" id="edit-name" class="form-input" value="${userData.displayName}"></div>
+<div class="form-group"><label class="form-label">Bio</label><textarea id="edit-bio" class="form-input">${userData.bio||''}</textarea></div>
+<button class="btn btn-primary w-full" onclick="saveProfile()">Save</button>`);
+};
+window.saveProfile=()=>{
+userData.displayName=$('edit-name').value;userData.bio=$('edit-bio').value;saveState();closeModal();render();
+toast('Profile saved!','success');
+};
+
+/* ============= AVATAR ============= */
+route('/avatar',()=>{
+const av=userData.avatarConfig;
+$('app').innerHTML=`
+<div class="page">
+<h2 class="text-xl font-bold mb-4 flex items-center gap-2">${Icons.avatar()} Avatar</h2>
+<div class="flex gap-6" style="flex-wrap:wrap">
+<div style="flex:0 0 auto">
+<div class="avatar-preview" style="width:240px;height:320px">
+<svg viewBox="0 0 200 300" width="220" height="300">
+<rect x="75" y="30" width="50" height="60" rx="20" fill="${av.skin}"/>
+<circle cx="90" cy="55" r="3" fill="#111"/><circle cx="110" cy="55" r="3" fill="#111"/>
+<path d="M95 70 Q100 75 105 70" stroke="#111" stroke-width="2" fill="none"/>
+<rect x="70" y="90" width="60" height="80" rx="8" fill="${av.shirt}"/>
+<rect x="75" y="170" width="22" height="70" rx="6" fill="${av.pants}"/>
+<rect x="103" y="170" width="22" height="70" rx="6" fill="${av.pants}"/>
+</svg>
+</div>
+<div class="flex gap-2 mt-3 justify-center">
+<button class="btn btn-secondary btn-sm" onclick="randomAvatar()">${Icons.sparkle()} Random</button>
+<button class="btn btn-primary btn-sm" onclick="saveAvatar()">${Icons.edit()} Save</button>
+</div>
+</div>
+<div style="flex:1;min-width:280px">
+<div class="card mb-3">
+<h3 class="font-bold mb-3">Skin Color</h3>
+<div class="flex gap-2 flex-wrap">
+${['#FFD5A0','#F5C9A0','#D4A574','#C08552','#8D5524','#5C3A1E'].map(c=>`<button class="color-swatch ${av.skin===c?'active':''}" style="background:${c}" onclick="setAv('skin','${c}')"></button>`).join('')}
+</div>
+</div>
+<div class="card mb-3">
+<h3 class="font-bold mb-3">Shirt</h3>
+<div class="flex gap-2 flex-wrap">
+${['#0066FF','#FF3333','#FFB800','#00CC66','#8A2BE2','#111111','#FF6600','#5D4037'].map(c=>`<button class="color-swatch ${av.shirt===c?'active':''}" style="background:${c}" onclick="setAv('shirt','${c}')"></button>`).join('')}
+</div>
+</div>
+<div class="card">
+<h3 class="font-bold mb-3">Pants</h3>
+<div class="flex gap-2 flex-wrap">
+${['#1A1A2E','#2C3E50','#5D4037','#1565C0','#424242','#111111','#4A148C','#B71C1C'].map(c=>`<button class="color-swatch ${av.pants===c?'active':''}" style="background:${c}" onclick="setAv('pants','${c}')"></button>`).join('')}
+</div>
+</div>
+</div>
+</div>
+</div>`;
+});
+window.setAv=(part,color)=>{userData.avatarConfig[part]=color;saveState();render()};
+window.randomAvatar=()=>{const r=()=>'#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');userData.avatarConfig={skin:r(),shirt:r(),pants:r()};saveState();render();toast('Randomized!','success')};
+window.saveAvatar=()=>{toast('Avatar saved!','success')};
+
+/* ============= FRIENDS ============= */
+route('/friends',()=>{
+$('app').innerHTML=`
+<div class="page">
+<h2 class="text-xl font-bold mb-4 flex items-center gap-2">${Icons.users()} Friends</h2>
+<div class="grid grid-2">
+${fakeUsers.map(u=>`<div class="card flex items-center gap-3">
+<div class="row-avatar" style="background:${userColor(u)}">${u.slice(0,2).toUpperCase()}</div>
+<div style="flex:1"><div class="font-semibold">${u}</div><div class="text-xs text-secondary flex items-center gap-1"><span class="online-dot"></span> Online · ${Math.floor(Math.random()*10)} mutual</div></div>
+<div class="flex gap-2">
+<button class="btn btn-secondary btn-sm btn-icon" onclick="navigate('#/messages')">${Icons.message()}</button>
+<button class="btn btn-outline btn-sm btn-icon" style="color:var(--danger)" onclick="this.closest('.card').style.display='none';toast('Friend removed','info')">${Icons.delete()}</button>
+</div>
+</div>`).join('')}
+</div>
+</div>`;
+});
+
+/* ============= MESSAGES ============= */
+route('/messages',()=>{
+$('app').innerHTML=`
+<div class="page">
+<div class="msg-layout" id="msg-layout">
+<div class="msg-list">
+${fakeUsers.slice(0,6).map((u,i)=>`<div class="msg-row" onclick="openChat('${u}')">
+<div class="flex items-center gap-3">
+<div class="row-avatar" style="background:${userColor(u)}">${u.slice(0,2).toUpperCase()}</div>
+<div style="flex:1;min-width:0"><div class="font-semibold text-sm">${u}</div><div class="text-xs text-secondary truncate">${i%2===0?'Hey! Want to play?':'See you in game!'}</div></div>
+<div class="text-xs text-tertiary">${i+1}h</div>
+</div>
+</div>`).join('')}
+</div>
+<div class="msg-panel" id="msg-panel">
+<div class="flex flex-col items-center justify-center h-full text-tertiary">${Icons.message()}<div class="mt-2 text-sm">Select a conversation</div></div>
+</div>
+</div>
+</div>`;
+});
+window.openChat=name=>{
+$('msg-layout').classList.add('chat-open');
+$('msg-panel').innerHTML=`
+<div style="padding:14px 16px;border-bottom:1px solid var(--border);font-weight:700;display:flex;align-items:center;gap:8px">
+${name}
+</div>
+<div class="msg-body" id="msgs">
+<div class="msg-bubble received">Hey! Want to play some games? 🎮</div>
+<div class="msg-bubble sent">Sure! What are you playing?</div>
+<div class="msg-bubble received">Create a game and invite me when it is ready!</div>
+</div>
+<div style="padding:12px;border-top:1px solid var(--border);display:flex;gap:8px">
+<input type="text" id="chat-input" class="form-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()">
+<button class="btn btn-primary" onclick="sendMsg()">${Icons.send()}</button>
+</div>`;
+};
+window.sendMsg=()=>{
+const inp=$('chat-input');const v=inp.value.trim();if(!v)return;
+$('msgs').insertAdjacentHTML('beforeend',`<div class="msg-bubble sent">${v.replace(/</g,'&lt;')}</div>`);
+inp.value='';$('msgs').scrollTop=$('msgs').scrollHeight;
+};
+
+/* ============= GROUPS ============= */
+route('/groups',()=>{
+const grps=['Builders Club','Speed Runners','Horror Fans','Game Devs','Creative Studio','Social Hub'];
+$('app').innerHTML=`
+<div class="page">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-xl font-bold flex items-center gap-2">${Icons.group()} Groups</h2>
+<button class="btn btn-primary" onclick="createGroup()">${Icons.plus()} Create Group <span style="display:inline-flex;align-items:center;gap:2px;background:rgba(255,255,255,.2);padding:2px 6px;border-radius:6px;font-size:11px;margin-left:4px"><img src="assets/bond.png" class="currency-icon-sm" style="width:12px;height:12px"> 50</span></button>
+</div>
+<div class="grid grid-3">
+${grps.map(g=>`<div class="card">
+<div class="flex items-center gap-3">
+<div class="brand-logo" style="width:48px;height:48px;font-size:20px;border-radius:12px;background:${userColor(g)}">${g[0]}</div>
+<div><div class="font-bold">${g}</div><div class="text-xs text-secondary">${Math.floor(Math.random()*500)+20} members</div></div>
+</div>
+<p class="text-sm text-secondary mt-3">A community for ${g.toLowerCase()} enthusiasts.</p>
+<button class="btn btn-secondary btn-sm w-full mt-3" onclick="toast('Joined ${g}!','success')">${Icons.plus()} Join</button>
+</div>`).join('')}
+</div>
+</div>`;
+});
+window.createGroup=()=>{
+if(userData.bonds<50){showInsufficientBonds(50,'Group Creation');return}
+openModal(`<div class="modal-header"><h3>Create Group</h3><button class="modal-close" onclick="closeModal()">${Icons.close()}</button></div>
+<div class="form-group"><label class="form-label">Group Name</label><input type="text" id="grp-name" class="form-input" placeholder="My Awesome Group"></div>
+<div class="form-group"><label class="form-label">Description</label><textarea id="grp-desc" class="form-input" placeholder="What's your group about?"></textarea></div>
+<div class="card mb-3" style="background:rgba(0,204,102,.05);border-color:rgba(0,204,102,.2);padding:12px"><div class="text-sm flex items-center gap-2"><strong>Cost:</strong> <span style="display:inline-flex;align-items:center;gap:4px;font-weight:700;color:var(--primary)"><img src="assets/bond.png" class="currency-icon"> 50 Bonds</span></div></div>
+<button class="btn btn-primary w-full" onclick="confirmGroup()">Create for 50 Bonds</button>`);
+};
+window.confirmGroup=()=>{
+const n=$('grp-name').value.trim();if(!n){toast('Enter a name','error');return}
+userData.bonds-=50;
+userData.transactions.unshift({type:'purchase',curr:'bonds',desc:`Created group "${n}"`,amount:-50,bal:userData.bonds,time:Date.now()});
+saveState();renderNav();closeModal();currencyToast(`Group "${n}" created!`,'success','bonds');
+};
+
+/* ============= CREATE HUB ============= */
+route('/create',()=>{
+const myGames=games.filter(g=>g.creator===userData.username);
+$('app').innerHTML=`
+<div class="page">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-xl font-bold flex items-center gap-2">${Icons.create()} Creator Hub</h2>
+<button class="btn btn-primary" onclick="newGame()">${Icons.plus()} New Game</button>
+</div>
+<div class="grid grid-2 mb-4">
+${myGames.length?myGames.map(g=>`<div class="card">
+<div class="flex gap-3 items-center">
+<div style="width:80px;height:60px;border-radius:10px;background:linear-gradient(135deg,${userColor(g.title)},${userColor(g.creator)});flex-shrink:0"></div>
+<div style="flex:1;min-width:0"><div class="font-semibold truncate">${g.title}</div><div class="text-xs text-secondary">${formatNum(g.visits)} visits · ${formatNum(g.players)} playing</div></div>
+</div>
+<div class="flex gap-2 mt-3">
+<button class="btn btn-secondary btn-sm" onclick="toast('Edit mode','info')">${Icons.edit()} Edit</button>
+<button class="btn btn-secondary btn-sm" onclick="navigate('#/currency')">${Icons.chart()} Stats</button>
+</div>
+</div>`).join(''):`<div class="card text-center p-6" style="grid-column:1/-1"><div class="feature-icon" style="margin:0 auto 12px">${Icons.create()}</div><h3 class="font-bold mb-2">No Games Yet</h3><p class="text-secondary text-sm mb-4">Create your first Bondaita game. It will appear in Discover immediately.</p><button class="btn btn-primary" onclick="newGame()">${Icons.plus()} Create Your First Game</button></div>`}
+</div>
+<div class="card">
+<h3 class="font-bold mb-3 flex items-center gap-2">${Icons.chart()} Analytics Overview</h3>
+<canvas id="visitsChart" height="80"></canvas>
+</div>
+</div>`;
+setTimeout(()=>{
+const ctx=$('visitsChart');if(!ctx)return;
+const isDark=document.documentElement.dataset.theme==='dark';
+const gridColor=isDark?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)';
+const textColor=isDark?'rgba(255,255,255,.6)':'rgba(0,0,0,.6)';
+const totalVisits=myGames.reduce((sum,g)=>sum+(g.visits||0),0);
+const chartData=totalVisits?[0,0,0,0,0,0,totalVisits]:[0,0,0,0,0,0,0];
+new Chart(ctx,{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Visits',data:chartData,borderColor:'#00CC66',backgroundColor:'rgba(0,204,102,.15)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#00CC66'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:gridColor},ticks:{color:textColor}},x:{grid:{display:false},ticks:{color:textColor}}}}});
+},50);
+});
+window.newGame=()=>{
+openModal(`<div class="modal-header"><h3>Create New Game</h3><button class="modal-close" onclick="closeModal()">${Icons.close()}</button></div>
+<div class="form-group"><label class="form-label">Game Title</label><input type="text" id="ng-title" class="form-input" placeholder="My Awesome Game"></div>
+<div class="form-group"><label class="form-label">Genre</label><select id="ng-genre" class="form-input">${genres.slice(1).map(g=>`<option>${g}</option>`).join('')}</select></div>
+<div class="form-group"><label class="form-label">Description</label><textarea id="ng-desc" class="form-input" placeholder="What's your game about?"></textarea></div>
+<button class="btn btn-primary w-full" onclick="confirmNewGame()">Create Game</button>`);
+};
+window.confirmNewGame=()=>{
+const t=$('ng-title').value.trim(),d=$('ng-desc').value.trim();
+if(!t){toast('Enter a title','error');return}
+games.unshift({id:'g_'+Date.now(),title:t,creator:userData.username,genre:$('ng-genre').value,visits:0,players:0,likes:0,dislikes:0,desc:d||'A new game on Bondaita.'});
+saveGames();
+closeModal();toast(`Game "${t}" created!`,'success');render();
+};
+
+/* ============= CURRENCY ============= */
+route('/currency',()=>{
+$('app').innerHTML=`
+<div class="page">
+<h2 class="text-xl font-bold mb-4 flex items-center gap-2">${Icons.exchange()} Currency</h2>
+
+<div class="grid grid-2 mb-4">
+<div class="balance-card">
+<img src="assets/bond.png" class="currency-icon-xl">
+<div><div class="text-xs text-secondary">Bonds</div><div class="balance-amount">${userData.bonds}</div><div class="text-xs text-secondary">Main purchase currency</div></div>
+</div>
+<div class="balance-card">
+<img src="assets/stud.png" class="currency-icon-xl">
+<div><div class="text-xs text-secondary">Studs</div><div class="balance-amount">${userData.studs}</div><div class="text-xs text-secondary">Earn freely, exchange for Bonds</div></div>
+</div>
+</div>
+
+<div class="exchange-box mb-4">
+<h3 class="font-bold mb-1 flex items-center gap-2">${Icons.exchange()} Exchange Studs for Bonds</h3>
+<div class="text-sm text-secondary mb-4">10 Studs = 1 Bond</div>
+<div class="form-group">
+<label class="form-label">Studs to exchange (min 10, multiples of 10)</label>
+<input type="number" id="ex-studs" class="form-input" value="10" min="10" step="10" max="${userData.studs}" oninput="updateEx()">
+<div class="form-hint text-xs text-secondary mt-2">Available: <strong>${userData.studs}</strong> Studs</div>
+</div>
+<div class="card mb-3" style="background:var(--surface-2);text-align:center;padding:14px">
+<div style="font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px">
+<span style="display:inline-flex;align-items:center;gap:4px"><img src="assets/stud.png" class="currency-icon-lg"> <span id="ex-s">10</span></span>
+<span style="color:var(--primary)">→</span>
+<span style="display:inline-flex;align-items:center;gap:4px"><img src="assets/bond.png" class="currency-icon-lg"> <span id="ex-b">1</span></span>
+</div>
+</div>
+<div class="flex gap-2 flex-wrap mb-3">
+${[[10,1],[50,5],[100,10],[500,50],[1000,100]].map(([s,b])=>`<button class="quick-btn" onclick="setEx(${s})" ${userData.studs<s?'disabled':''}><img src="assets/stud.png" class="currency-icon-sm"> ${s} → <img src="assets/bond.png" class="currency-icon-sm"> ${b}</button>`).join('')}
+<button class="quick-btn" onclick="setEx(${Math.floor(userData.studs/10)*10})" ${userData.studs<10?'disabled':''}>All ${Math.floor(userData.studs/10)*10}</button>
+</div>
+<button class="btn btn-primary w-full btn-lg" onclick="doExchange()" ${userData.studs<10?'disabled':''}>${Icons.exchange()} Exchange Now</button>
+</div>
+
+<h3 class="font-bold mb-3 flex items-center gap-2">${Icons.trophy()} Earn Studs</h3>
+<div class="grid grid-3 mb-4">
+<div class="card">
+<div class="flex items-center gap-3 mb-2">
+<div class="feature-icon" style="width:40px;height:40px;margin:0">${Icons.sparkle()}</div>
+<div class="font-semibold">Daily Login</div>
+</div>
+<div class="text-sm text-secondary flex items-center gap-1"><img src="assets/stud.png" class="currency-icon-sm"> +10 Studs per day</div>
+</div>
+<div class="card">
+<div class="flex items-center gap-3 mb-2">
+<div class="feature-icon" style="width:40px;height:40px;margin:0;background:rgba(255,102,0,.1);color:var(--accent)">${Icons.flame()}</div>
+<div class="font-semibold">7-Day Streak</div>
+</div>
+<div class="text-sm text-secondary flex items-center gap-1"><img src="assets/stud.png" class="currency-icon-sm"> +50 bonus</div>
+<div class="text-xs font-bold mt-2" style="color:var(--accent)">🔥 ${userData.loginStreak}-day streak</div>
+</div>
+<div class="card">
+<div class="flex items-center gap-3 mb-2">
+<div class="feature-icon" style="width:40px;height:40px;margin:0;background:rgba(255,184,0,.1);color:var(--warning)">${Icons.trophy()}</div>
+<div class="font-semibold">Milestones</div>
+</div>
+<div class="text-sm text-secondary flex items-center gap-1"><img src="assets/stud.png" class="currency-icon-sm"> Up to 2,000</div>
+</div>
+</div>
+
+<h3 class="font-bold mb-3 flex items-center gap-2">${Icons.sparkle()} Buy Bonds <span class="text-sm text-secondary font-normal">(Demo Mode)</span></h3>
+<div class="grid grid-3 mb-4">
+${[[10,'$0.99'],[50,'$4.49'],[100,'$8.99'],[500,'$39.99'],[1000,'$74.99']].map(([a,p])=>`<div class="card text-center"><div style="font-size:24px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:4px"><img src="assets/bond.png" class="currency-icon-lg"> ${a}</div><div class="text-sm text-secondary mb-3">${p}</div><button class="btn btn-primary btn-sm w-full" onclick="demoBuy(${a})">Buy Now</button></div>`).join('')}
+</div>
+
+<h3 class="font-bold mb-3 flex items-center gap-2">${Icons.chart()} Transaction History</h3>
+<div class="card" id="tx-list" style="padding:0;max-height:400px;overflow-y:auto"></div>
+</div>`;
+renderTx();
+});
+window.updateEx=()=>{const v=parseInt($('ex-studs').value)||0;$('ex-s').textContent=v;$('ex-b').textContent=Math.floor(v/10)};
+window.setEx=v=>{$('ex-studs').value=v;updateEx()};
+window.doExchange=()=>{
+const s=parseInt($('ex-studs').value)||0;
+if(s<10){toast('Minimum 10 Studs','error');return}
+if(s%10!==0){toast('Must be a multiple of 10','error');return}
+if(userData.studs<s){toast('Not enough Studs','error');return}
+openModal(`<div class="modal-header"><h3>Confirm Exchange</h3><button class="modal-close" onclick="closeModal()">${Icons.close()}</button></div>
+<div class="text-center p-2">
+<p class="text-secondary mb-3">Exchange Studs for Bonds</p>
+<div class="card mb-4" style="background:var(--surface-2);text-align:center;padding:20px">
+<div style="font-size:24px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:12px">
+<span style="display:inline-flex;align-items:center;gap:6px"><img src="assets/stud.png" class="currency-icon-xl"> ${s}</span>
+<span style="color:var(--primary)">→</span>
+<span style="display:inline-flex;align-items:center;gap:6px"><img src="assets/bond.png" class="currency-icon-xl"> ${s/10}</span>
+</div>
+</div>
+<p class="text-xs text-tertiary mb-4">This exchange cannot be reversed.</p>
+<button class="btn btn-primary w-full" onclick="confirmExchange(${s},${s/10})">Confirm Exchange</button>
+</div>`);
+};
+window.confirmExchange=(s,b)=>{
+userData.studs-=s;userData.bonds+=b;
+userData.transactions.unshift({type:'exchange',curr:'mixed',desc:`Exchanged ${s} Studs for ${b} Bonds`,amount:0,bal:userData.bonds,time:Date.now(),studChange:-s,bondChange:b});
+saveState();renderNav();closeModal();currencyToast(`Exchanged ${s} Studs for ${b} Bonds!`,'success','bonds');render();
+};
+window.demoBuy=amt=>{
+userData.bonds+=amt;
+userData.transactions.unshift({type:'purchase',curr:'bonds',desc:`Demo: bought ${amt} Bonds`,amount:amt,bal:userData.bonds,time:Date.now()});
+saveState();renderNav();currencyToast(`+${amt} Bonds (demo)`,'success','bonds');render();
+};
+function renderTx(){
+const el=$('tx-list');if(!el)return;
+const txs=userData.transactions||[];
+if(!txs.length){el.innerHTML='<div class="p-6 text-center text-secondary text-sm">No transactions yet. Start playing to earn Studs!</div>';return}
+el.innerHTML=txs.map(t=>`<div class="flex items-center justify-between" style="padding:14px 20px;border-bottom:1px solid var(--border);gap:12px">
+<div style="flex:1;min-width:0"><div class="text-sm font-semibold truncate">${t.desc}</div><div class="text-xs text-tertiary">${new Date(t.time).toLocaleString()}</div></div>
+<div class="text-sm font-bold" style="white-space:nowrap;display:flex;align-items:center;gap:4px">
+${t.curr==='bonds'?'<img src="assets/bond.png" class="currency-icon-sm">':t.curr==='studs'?'<img src="assets/stud.png" class="currency-icon-sm">':''}
+${t.amount>0?'+':''}${t.amount!==0?t.amount:`${t.studChange||0}/${t.bondChange||0}`}
+</div>
+</div>`).join('');
+}
+
+function showInsufficientBonds(needed,item){
+openModal(`<div class="modal-header"><h3 style="color:var(--danger)">Insufficient Bonds</h3><button class="modal-close" onclick="closeModal()">${Icons.close()}</button></div>
+<p class="text-secondary text-sm mb-3">You need <strong style="color:var(--danger)">${needed}</strong> Bonds${item?' for <strong>'+item+'</strong>':''}.</p>
+<div class="card mb-2 flex items-center gap-3" style="padding:14px">
+<img src="assets/bond.png" class="currency-icon-lg">
+<div><div class="font-bold">${userData.bonds} Bonds</div><div class="text-xs text-secondary">Current balance</div></div>
+</div>
+<div class="card mb-3 flex items-center gap-3" style="padding:14px">
+<img src="assets/stud.png" class="currency-icon-lg">
+<div><div class="font-bold">${userData.studs} Studs</div><div class="text-xs text-secondary">Exchange for Bonds</div></div>
+</div>
+<div class="card mb-4" style="background:rgba(255,184,0,.1);border-color:rgba(255,184,0,.3);padding:12px;text-align:center;font-size:13px">
+<strong style="color:var(--warning)">Short by ${needed-userData.bonds} Bonds</strong>
+</div>
+<button class="btn btn-primary w-full" onclick="closeModal();navigate('#/currency')">${Icons.exchange()} Exchange Now</button>
+`);
+}
+window.showInsufficientBonds=showInsufficientBonds;
+
+/* ============= SETTINGS ============= */
+route('/settings',()=>{
+$('app').innerHTML=`
+<div class="page">
+<h2 class="text-xl font-bold mb-4 flex items-center gap-2">${Icons.settings()} Settings</h2>
+<div class="grid grid-2">
+<div class="card">
+<h3 class="font-bold mb-3">Account</h3>
+<div class="form-group"><label class="form-label">Username</label><input type="text" class="form-input" value="${userData.username}" disabled></div>
+<div class="form-group"><label class="form-label">Display Name</label><input type="text" id="set-name" class="form-input" value="${userData.displayName}"></div>
+<div class="form-group"><label class="form-label">Bio</label><textarea id="set-bio" class="form-input">${userData.bio||''}</textarea></div>
+<button class="btn btn-primary w-full" onclick="saveSettings()">Save Changes</button>
+</div>
+<div>
+<div class="card mb-3">
+<h3 class="font-bold mb-3">Appearance</h3>
+<div class="flex gap-2">
+<button class="btn btn-sm ${document.documentElement.dataset.theme!=='dark'?'btn-primary':'btn-secondary'}" onclick="toggleTheme()">${Icons.sun()} Light</button>
+<button class="btn btn-sm ${document.documentElement.dataset.theme==='dark'?'btn-primary':'btn-secondary'}" onclick="toggleTheme()">${Icons.moon()} Dark</button>
+</div>
+</div>
+<div class="card" style="border-color:rgba(255,51,51,.3)">
+<h3 class="font-bold mb-2" style="color:var(--danger)">${Icons.shield()} Danger Zone</h3>
+<p class="text-sm text-secondary mb-3">Reset all progress and start over.</p>
+<button class="btn btn-danger w-full" onclick="resetAccount()">${Icons.delete()} Reset Account</button>
+</div>
+</div>
+</div>
+</div>`;
+});
+window.saveSettings=()=>{userData.displayName=$('set-name').value;userData.bio=$('set-bio').value;saveState();renderNav();toast('Settings saved!','success')};
+window.resetAccount=()=>{if(confirm('Reset all progress? This cannot be undone.')){clearState();localStorage.removeItem('bondaita_userData');localStorage.removeItem('bondaita_games');games=[];toast('Account reset','info');navigate('#/');render()}};
+
+/* ============= NOTIFICATIONS ============= */
+route('/notifications',()=>{
+$('app').innerHTML=`
+<div class="page">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-xl font-bold flex items-center gap-2">${Icons.bell()} Notifications</h2>
+<button class="btn btn-secondary btn-sm" onclick="markAllRead()">${Icons.check()} Mark all read</button>
+</div>
+<div id="notif-list"></div>
+</div>`;
+renderNotifs();
+});
+function renderNotifs(){
+const list=$('notif-list');
+const notifs=userData.notifications||[];
+if(!notifs.length){list.innerHTML='<div class="card text-center p-6 text-secondary">No notifications yet</div>';return}
+list.innerHTML=notifs.map(n=>`<div class="card mb-2 flex items-center gap-3" style="${n.read?'opacity:.6':''}">
+<div class="feature-icon" style="width:40px;height:40px;margin:0">${Icons.sparkle()}</div>
+<div style="flex:1"><div class="font-semibold text-sm">${n.title}</div><div class="text-xs text-secondary">${n.message}</div><div class="text-xs text-tertiary mt-1">${new Date(n.time).toLocaleString()}</div></div>
+${!n.read?'<div style="width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0"></div>':''}
+</div>`).join('');
+userData.notifications.forEach(n=>n.read=true);saveState();renderNav();
+}
+window.markAllRead=()=>{renderNotifs()};
+
+/* ============= SEARCH ============= */
+route('/search',()=>{
+const q=new URLSearchParams(location.hash.split('?')[1]).get('q')||'';
+const res=q?games.filter(g=>g.title.toLowerCase().includes(q.toLowerCase())||g.genre.toLowerCase().includes(q.toLowerCase())):games;
+$('app').innerHTML=`
+<div class="page">
+<h2 class="text-xl font-bold mb-3 flex items-center gap-2">${Icons.search()} Search</h2>
+<div class="form-group mb-4"><input type="text" id="search-inp" class="form-input" value="${q}" placeholder="Search games..." onkeydown="if(event.key==='Enter')navigate('#/search?q='+encodeURIComponent(this.value))"></div>
+<div class="grid grid-4">${res.map(gameCard).join('')}</div>
+${!res.length?'<div class="card text-center p-6 text-secondary">No results found</div>':''}
+</div>`;
+});
+
+/* ============= 404 ============= */
+route('/404',render404);
+function render404(){
+$('navbar').className='';
+$('app').innerHTML=`<div class="page text-center" style="padding-top:120px">
+<div style="font-size:96px;font-weight:900;color:var(--primary);line-height:1">404</div>
+<h2 class="text-xl font-bold mt-4">Page Not Found</h2>
+<p class="text-secondary mt-2 mb-4">The page you're looking for doesn't exist.</p>
+<a href="#/discover" class="btn btn-primary">${Icons.home()} Back to Discover</a>
+</div>`;
+}
+
+/* ============= INIT ============= */
+loadState();
+render();
+</script>
+</body>
+</html>
