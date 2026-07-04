@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuth() { return request.auth != null; }
+    function isOwner(uid) { return request.auth.uid == uid; }
+    function isAdmin() {
+      return isAuth() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    match /users/{userId} {
+      allow read: if isAuth();
+      allow create: if isOwner(userId);
+      allow update, delete: if isOwner(userId) || isAdmin();
+
+      match /friends/{fid} {
+        allow read: if isAuth();
+        allow write: if isOwner(userId) || isOwner(fid);
+      }
+      match /inventory/{iid} {
+        allow read: if isAuth();
+        allow write: if isOwner(userId);
+      }
+      match /notifications/{nid} {
+        allow read: if isOwner(userId);
+        allow create: if isAuth();
+        allow update, delete: if isOwner(userId);
+      }
+      match /transactions/{tid} {
+        allow read, create: if isOwner(userId);
+      }
+    }
+
+    match /games/{gameId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update, delete: if isAuth() && (request.auth.uid == resource.data.creatorId || isAdmin());
+
+      match /comments/{cid} {
+        allow read, create: if isAuth();
+        allow delete: if isAuth() && (request.auth.uid == resource.data.userId ||
+          request.auth.uid == get(/databases/$(database)/documents/games/$(gameId)).data.creatorId || isAdmin());
+      }
+      match /votes/{uid} {
+        allow read: if isAuth();
+        allow write: if isOwner(uid);
+      }
+    }
+
+    match /catalogItems/{itemId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth() && (request.auth.uid == resource.data.creatorId || isAdmin());
+    }
+
+    match /groups/{groupId} {
+      allow read: if isAuth();
+      allow create, update: if isAuth();
+      allow delete: if isAuth() && (request.auth.uid == resource.data.ownerId || isAdmin());
+
+      match /members/{uid} {
+        allow read, write: if isAuth();
+      }
+      match /wall/{pid} {
+        allow read, create: if isAuth();
+        allow delete: if isAuth() && (request.auth.uid == resource.data.userId || isAdmin());
+      }
+    }
+
+    match /conversations/{convId} {
+      allow read, update: if isAuth() && request.auth.uid in resource.data.participants;
+      allow create: if isAuth();
+
+      match /messages/{msgId} {
+        allow read, create: if isAuth() && request.auth.uid in
+          get(/databases/$(database)/documents/conversations/$(convId)).data.participants;
+      }
+    }
+
+    match /reports/{rid} {
+      allow create: if isAuth();
+      allow read: if isAdmin();
+    }
+
+    match /achievements/{achievementId} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+  }
+}
